@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Register – QuizMaster{% endblock %}
+
+{% block extra_css %}
+<style>
+  .auth-wrapper {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    animation: fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .auth-icon {
+    width: 52px; height: 52px;
+    background: rgba(67,217,173,0.12);
+    border: 1px solid rgba(67,217,173,0.3);
+    border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1.5rem;
+  }
+  .auth-title { font-family: 'Syne', sans-serif; font-size: 1.7rem; font-weight: 800; margin-bottom: 0.4rem; }
+  .auth-sub { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 2rem; }
+  .auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.88rem; color: var(--text-dim); }
+  .btn-block { width: 100%; justify-content: center; padding: 13px; }
+
+  .password-hint {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 5px;
+  }
+  .auth-wrapper::before {
+    content: '';
+    position: fixed;
+    top: 20%; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(67,217,173,0.05) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .auth-card { position: relative; z-index: 1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-icon">✨</div>
+    <h1 class="auth-title">Create account</h1>
+    <p class="auth-sub">Join QuizMaster and start testing your knowledge</p>
+
+    <form method="POST" action="/auth/register">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name"
+               placeholder="Alex Johnson" required autocomplete="name" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email"
+               placeholder="you@example.com" required autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="Min. 6 characters" required />
+        <p class="password-hint">Must be at least 6 characters long</p>
+      </div>
+      <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password"
+               placeholder="Repeat your password" required />
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">
+        Create Account →
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Already have an account?
+      <a href="/auth/login">Sign in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

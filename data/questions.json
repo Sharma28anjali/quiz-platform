@@ -1,0 +1,87 @@
+[
+  {
+    "id": 1,
+    "question": "What does HTML stand for?",
+    "options": [
+      "Hyper Text Markup Language",
+      "High Tech Modern Language",
+      "Hyperlink and Text Markup Language",
+      "Home Tool Markup Language"
+    ],
+    "correct_answer": "Hyper Text Markup Language",
+    "category": "Web Development"
+  },
+  {
+    "id": 2,
+    "question": "Which programming language is known as the 'language of the web'?",
+    "options": ["Python", "Java", "JavaScript", "C++"],
+    "correct_answer": "JavaScript",
+    "category": "Web Development"
+  },
+  {
+    "id": 3,
+    "question": "What is the correct way to declare a variable in Python?",
+    "options": ["var x = 5", "int x = 5", "x = 5", "declare x = 5"],
+    "correct_answer": "x = 5",
+    "category": "Python"
+  },
+  {
+    "id": 4,
+    "question": "Which data structure follows the LIFO (Last In, First Out) principle?",
+    "options": ["Queue", "Stack", "Array", "Linked List"],
+    "correct_answer": "Stack",
+    "category": "Data Structures"
+  },
+  {
+    "id": 5,
+    "question": "What does CSS stand for?",
+    "options": [
+      "Computer Style Sheets",
+      "Cascading Style Sheets",
+      "Creative Style Syntax",
+      "Colorful Style Sheets"
+    ],
+    "correct_answer": "Cascading Style Sheets",
+    "category": "Web Development"
+  },
+  {
+    "id": 6,
+    "question": "Which of the following is NOT a Python data type?",
+    "options": ["List", "Dictionary", "Tuple", "Pointer"],
+    "correct_answer": "Pointer",
+    "category": "Python"
+  },
+  {
+    "id": 7,
+    "question": "What is the time complexity of Binary Search?",
+    "options": ["O(n)", "O(n²)", "O(log n)", "O(1)"],
+    "correct_answer": "O(log n)",
+    "category": "Algorithms"
+  },
+  {
+    "id": 8,
+    "question": "In SQL, which command is used to retrieve data from a database?",
+    "options": ["GET", "FETCH", "SELECT", "RETRIEVE"],
+    "correct_answer": "SELECT",
+    "category": "Database"
+  },
+  {
+    "id": 9,
+    "question": "What does API stand for?",
+    "options": [
+      "Application Programming Interface",
+      "Advanced Program Integration",
+      "Automated Process Instruction",
+      "Application Process Interface"
+    ],
+    "correct_answer": "Application Programming Interface",
+    "category": "General CS"
+  },
+  {
+    "id": 10,
+    "question": "Which HTTP method is used to send data to a server to create a resource?",
+    "options": ["GET", "POST", "PUT", "DELETE"],
+    "correct_answer": "POST",
+    "category": "Web Development"
+  }
+]

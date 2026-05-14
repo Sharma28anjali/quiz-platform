@@ -1,0 +1,18 @@
+# render.yaml
+# Auto-deploys your app when you push to GitHub
+# ─────────────────────────────────────────────
+services:
+  - type: web
+    name: quizmaster
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true        # Render auto-generates a secure value
+      - key: MONGO_URI
+        sync: false                # You enter this manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FLASK_ENV
+        value: production

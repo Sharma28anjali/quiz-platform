@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Result – QuizMaster{% endblock %}
+
+{% block extra_css %}
+<style>
+  .result-page { max-width: 760px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+
+  /* Score hero */
+  .score-hero {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    animation: zoomIn 0.5s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .score-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%;
+    transform: translateX(-50%);
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(108,99,255,0.12), transparent 70%);
+    pointer-events: none;
+  }
+  @keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .grade-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
+    border: 3px solid;
+  }
+
+  .score-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .score-fraction { font-size: 1rem; color: var(--text-dim); margin-bottom: 0.8rem; }
+  .score-message  { font-size: 1.1rem; font-weight: 500; margin-bottom: 2rem; }
+
+  .result-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  /* Stats row */
+  .result-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .res-stat {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .res-stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+  }
+  .res-stat-lbl { font-size: 0.8rem; color: var(--text-dim); }
+
+  /* Breakdown table */
+  .breakdown {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    animation: fadeUp 0.4s ease 0.2s both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .breakdown-header {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  .breakdown-item {
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 1rem;
+    align-items: start;
+    transition: background 0.15s;
+  }
+  .breakdown-item:last-child { border-bottom: none; }
+  .breakdown-item:hover { background: rgba(255,255,255,0.02); }
+  .bi-icon { font-size: 1.1rem; padding-top: 2px; }
+  .bi-q    { font-size: 0.9rem; line-height: 1.5; }
+  .bi-q strong { display: block; margin-bottom: 4px; }
+  .bi-answer {
+    font-size: 0.82rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .bi-correct { background: rgba(34,197,94,0.15);  color: #86efac; }
+  .bi-wrong   { background: rgba(239,68,68,0.15);  color: #fca5a5; }
+  .wrong-note { font-size: 0.8rem; color: var(--text-dim); margin-top: 4px; }
+  .wrong-note span { color: #86efac; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="result-page">
+
+  <!-- ── Score Hero ────────────────────────────────── -->
+  <div class="score-hero">
+    <div class="grade-badge"
+         style="color: {{ grade.color }}; border-color: {{ grade.color }};
+                background: {{ grade.color }}20;">
+      {{ grade.grade }}
+    </div>
+    <div class="score-number" style="color: {{ grade.color }}">
+      {{ percentage }}%
+    </div>
+    <p class="score-fraction">{{ score }} correct out of {{ total }} questions</p>
+    <p class="score-message">{{ grade.message }}</p>
+
+    <div class="result-actions">
+      <a href="/quiz" class="btn btn-primary">🔄 Retake Quiz</a>
+      <a href="/dashboard" class="btn btn-outline">🏠 Dashboard</a>
+      <a href="/history" class="btn btn-outline">📊 All Results</a>
+    </div>
+  </div>
+
+  <!-- ── Stats Row ─────────────────────────────────── -->
+  <div class="result-stats">
+    <div class="res-stat">
+      <div class="res-stat-val" style="color: var(--success)">{{ score }}</div>
+      <div class="res-stat-lbl">✅ Correct</div>
+    </div>
+    <div class="res-stat">
+      <div class="res-stat-val" style="color: var(--error)">{{ total - score }}</div>
+      <div class="res-stat-lbl">❌ Wrong</div>
+    </div>
+    <div class="res-stat">
+      <div class="res-stat-val" style="color: var(--accent)">{{ total }}</div>
+      <div class="res-stat-lbl">📝 Total</div>
+    </div>
+  </div>
+
+  <!-- ── Answer Breakdown ──────────────────────────── -->
+  <div class="breakdown">
+    <div class="breakdown-header">📋 Answer Review</div>
+
+    {% for item in breakdown %}
+    <div class="breakdown-item">
+      <div class="bi-icon">
+        {% if item.is_correct %}✅{% else %}❌{% endif %}
+      </div>
+      <div class="bi-q">
+        <strong>Q{{ item.question_id }}. {{ item.question }}</strong>
+        <div class="wrong-note">
+          Your answer: <span>{{ item.selected }}</span>
+          {% if not item.is_correct %}
+            &nbsp;·&nbsp; Correct: <span>{{ item.correct }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="bi-answer {% if item.is_correct %}bi-correct{% else %}bi-wrong{% endif %}">
+        {% if item.is_correct %}Correct{% else %}Wrong{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

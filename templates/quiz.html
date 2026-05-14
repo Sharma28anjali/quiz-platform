@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% block title %}Quiz – QuizMaster{% endblock %}
+
+{% block extra_css %}
+<style>
+  .quiz-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 1.5rem;
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 0 1.5rem 4rem;
+    align-items: start;
+  }
+
+  /* ── Question Card ─────────────────────────────── */
+  .question-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    animation: fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  .q-counter {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+  }
+  .q-category {
+    background: rgba(108,99,255,0.12);
+    color: #a5b4fc;
+    border: 1px solid rgba(108,99,255,0.25);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  /* Progress bar */
+  .q-progress-track {
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 4px;
+    margin-bottom: 2rem;
+  }
+  .q-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  .q-text {
+    font-size: 1.15rem;
+    font-weight: 500;
+    line-height: 1.6;
+    margin-bottom: 1.8rem;
+    min-height: 3rem;
+  }
+
+  /* Options */
+  .options-grid { display: grid; gap: 0.75rem; }
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 14px 18px;
+    background: var(--bg3);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .option-label:hover {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.08);
+  }
+  .option-label input[type="radio"] { display: none; }
+  .option-label.selected {
+    border-color: var(--accent);
+    background: rgba(108,99,255,0.15);
+    color: #c7d2fe;
+  }
+  .option-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .option-label.selected .option-letter {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  /* Navigation buttons */
+  .q-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Sidebar ────────────────────────────────────── */
+  .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+  .sidebar-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+  }
+  .sidebar-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  /* Timer */
+  .timer-display {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-align: center;
+    color: var(--accent3);
+    letter-spacing: 2px;
+  }
+  .timer-display.warn { color: var(--warning); }
+  .timer-display.danger { color: var(--error); animation: pulse 0.6s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  /* Question map */
+  .q-map {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .q-map-dot {
+    height: 32px;
+    border-radius: 6px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .q-map-dot.answered  { background: rgba(108,99,255,0.2); border-color: var(--accent); color: #a5b4fc; }
+  .q-map-dot.current   { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* Submit button */
+  .btn-submit {
+    width: 100%;
+    justify-content: center;
+    background: var(--accent3);
+    color: #0d1117;
+    font-weight: 700;
+  }
+  .btn-submit:hover {
+    background: #38c99a;
+    color: #0d1117;
+    box-shadow: 0 4px 16px rgba(67,217,173,0.3);
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  /* Hidden questions (for SPA-like flow) */
+  .question-block { display: none; }
+  .question-block.active { display: block; }
+
+  @media (max-width: 700px) {
+    .quiz-layout { grid-template-columns: 1fr; }
+    .sidebar { order: -1; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="/quiz/submit" id="quiz-form">
+<div class="quiz-layout">
+
+  <!-- ── Question Panel ───────────────────────────── -->
+  <div class="question-card">
+    {% for q in questions %}
+    <div class="question-block {% if loop.first %}active{% endif %}"
+         id="q-block-{{ loop.index }}" data-index="{{ loop.index }}">
+
+      <!-- Meta row -->
+      <div class="q-meta">
+        <span class="q-counter">Question {{ loop.index }} of {{ total }}</span>
+        <span class="q-category">{{ q.category }}</span>
+      </div>
+
+      <!-- Progress -->
+      <div class="q-progress-track">
+        <div class="q-progress-fill" id="progress-fill"
+             style="width: {{ (loop.index / total * 100)|round }}%"></div>
+      </div>
+
+      <!-- Question Text -->
+      <p class="q-text">{{ q.question }}</p>
+
+      <!-- Options -->
+      <div class="options-grid">
+        {% set letters = ['A', 'B', 'C', 'D'] %}
+        {% for option in q.options %}
+        <label class="option-label" id="opt-{{ q.id }}-{{ loop.index0 }}">
+          <input type="radio"
+                 name="answer_{{ q.id }}"
+                 value="{{ option }}"
+                 onchange="markAnswered({{ loop.index0 }}, this)" />
+          <span class="option-letter">{{ letters[loop.index0] }}</span>
+          {{ option }}
+        </label>
+        {% endfor %}
+      </div>
+
+      <!-- Navigation -->
+      <div class="q-nav">
+        <button type="button" class="btn btn-outline"
+                onclick="goTo({{ loop.index - 1 }})"
+                {% if loop.first %}disabled style="opacity:0.3"{% endif %}>
+          ← Prev
+        </button>
+
+        {% if not loop.last %}
+          <button type="button" class="btn btn-primary"
+                  onclick="goTo({{ loop.index + 1 }})">
+            Next →
+          </button>
+        {% else %}
+          <button type="button" class="btn btn-submit btn-primary"
+                  onclick="submitQuiz()">
+            Submit Quiz ✓
+          </button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ── Sidebar ────────────────────────────────────── -->
+  <div class="sidebar">
+
+    <!-- Timer -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">⏱ Time Remaining</div>
+      <div class="timer-display" id="timer">15:00</div>
+    </div>
+
+    <!-- Question Map -->
+    <div class="sidebar-card">
+      <div class="sidebar-title">📍 Question Map</div>
+      <div class="q-map">
+        {% for q in questions %}
+        <div class="q-map-dot {% if loop.first %}current{% endif %}"
+             id="dot-{{ loop.index }}"
+             onclick="goTo({{ loop.index }})">{{ loop.index }}</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Submit button -->
+    <button type="button" class="btn btn-submit" onclick="submitQuiz()">
+      🏁 Finish & Submit
+    </button>
+  </div>
+
+</div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const TOTAL = {{ total }};
+  let current = 1;
+  let answered = new Set();   // set of question indices (1-based) that have been answered
+  let timerEl = document.getElementById('timer');
+  let seconds  = 15 * 60;    // 15-minute timer
+
+  // ── Timer ────────────────────────────────────────────────────
+  function updateTimer() {
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    timerEl.textContent = `${m}:${s}`;
+    if (seconds <= 60) timerEl.className = 'timer-display danger';
+    else if (seconds <= 3 * 60) timerEl.className = 'timer-display warn';
+    if (seconds <= 0) { clearInterval(timerInterval); submitQuiz(); }
+    seconds--;
+  }
+  const timerInterval = setInterval(updateTimer, 1000);
+
+  // ── Navigate between questions ────────────────────────────────
+  function goTo(n) {
+    if (n < 1 || n > TOTAL) return;
+
+    document.getElementById(`q-block-${current}`).classList.remove('active');
+    document.getElementById(`dot-${current}`).classList.remove('current');
+
+    current = n;
+
+    document.getElementById(`q-block-${current}`).classList.add('active');
+    const dot = document.getElementById(`dot-${current}`);
+    dot.classList.remove('answered');
+    dot.classList.add('current');
+
+    // Update progress bar
+    const pct = (current / TOTAL) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  // ── Mark option selected ──────────────────────────────────────
+  function markAnswered(optIndex, radio) {
+    const qId    = radio.name.replace('answer_', '');
+    const labels = radio.closest('.options-grid').querySelectorAll('.option-label');
+    labels.forEach(l => l.classList.remove('selected'));
+    labels[optIndex].classList.add('selected');
+
+    // Mark dot answered
+    answered.add(current);
+    const dot = document.getElementById(`dot-${current}`);
+    // Keep 'current' class too for visual
+    dot.classList.add('answered');
+  }
+
+  // ── Submit ────────────────────────────────────────────────────
+  function submitQuiz() {
+    const unanswered = TOTAL - answered.size;
+    if (unanswered > 0) {
+      const ok = confirm(
+        `You have ${unanswered} unanswered question(s).\nSubmit anyway?`
+      );
+      if (!ok) return;
+    }
+    clearInterval(timerInterval);
+    document.getElementById('quiz-form').submit();
+  }
+</script>
+{% endblock %}
