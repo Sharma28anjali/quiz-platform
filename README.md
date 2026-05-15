@@ -1,6 +1,6 @@
 # QuizMaster – Online Quiz Platform
 
-A full-stack quiz/test platform built with **Flask**, **MongoDB Atlas**, and vanilla **HTML/CSS/JS**.
+A full-stack quiz/test platform built with **Flask**, **MongoDB**, and vanilla **HTML/CSS/JS**.
 
 ---
 
@@ -10,7 +10,7 @@ A full-stack quiz/test platform built with **Flask**, **MongoDB Atlas**, and van
 quiz-platform/
 │
 ├── app.py                     # Flask entry point & app factory
-├── db.py                      # MongoDB Atlas connection (singleton)
+├── db.py                      # MongoDB connection (singleton)
 ├── requirements.txt           # Python dependencies
 ├── Procfile                   # For Render/Heroku deployment
 ├── render.yaml                # Render auto-deploy config
